@@ -152,6 +152,8 @@ idock flash todo list --time 7d
 
 先从列表取得实际录音 ID，再读取或导出：
 
+录音 ID 是列表中的 `id`（会议主键），按字符串原样使用，不能使用听悟 `taskId`、导入任务 `job_id` 或纪要 `recordId`。导入完成后可使用任务响应中的 `recording_id`。`1.2.1` 补充了主键范围与精度校验，以及帮助和 schema 中的说明；版本状态见 [更新记录](CHANGELOG.md)。
+
 ```sh
 idock recording get <录音ID> --section summary
 idock recording download --id <录音ID> --source original --out ./downloads
