@@ -10,6 +10,8 @@
 | 运行环境 | Node.js 22 或以上，Windows / macOS / Linux |
 | 登录方式 | 用户个人 AccessKey |
 
+当前稳定版本为 **1.2.1**（2026-11-06），变更内容见 [更新记录](CHANGELOG.md)。
+
 ## 直接让 AI 帮你安装
 
 把下面这段提示词发送给具有终端执行能力的 Trae、Codex 或其它 AI Agent：
