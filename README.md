@@ -10,7 +10,9 @@
 | 运行环境 | Node.js 22 或以上，Windows / macOS / Linux |
 | 登录方式 | 用户个人 AccessKey |
 
-当前稳定版本为 **1.2.1**（2026-11-06），变更内容见 [更新记录](CHANGELOG.md)。
+当前稳定版本为 **1.2.2**（2026-11-11），已发布到 [npm 官方仓库](https://www.npmjs.com/package/@gdpisen/idock-cli/v/1.2.2)，变更内容见 [更新记录](CHANGELOG.md)。
+
+**1.2.2** 新增 RAG 时间筛选、来源展示、无匹配提示和统一参数错误码；以下新检索能力需要该版本及配套新版后端，升级 npm 包不会自动部署业务服务。
 
 ## 直接让 AI 帮你安装
 
@@ -148,6 +150,9 @@ Key 无效、过期或撤销时，取得有效 Key 后重新登录。权限不�
 ```sh
 idock recording list --time 7d --limit 5
 idock search "上次产品会议确定了哪些行动项" --limit 5
+idock search "会议行动项" --time last-week --limit 5
+idock --format text search "采购流程" --time 7d
+idock --timezone Asia/Shanghai search "采购流程" --from 2026-10-01T00:00:00+08:00 --to 2026-11-01T00:00:00+08:00
 idock flash note list --time today
 idock flash todo list --time 7d
 ```
@@ -173,6 +178,12 @@ idock schema
 ```
 
 `search` 只搜索用户 RAG 向量库。列表按返回的 `next_cursor` 续页；读取完整转写优先使用导出命令。每个用户的 CLI API 共用每秒一次限额，CLI 已内置有限重试，不需要 Agent 紧密循环重试。
+
+检索可用 `--time today/7d/last-week` 或带时区偏移的 `--from/--to` 限定录制时间，两者互斥，区间含起点、不含终点。问题中的“上周”等词不会自动限制候选。相对时间使用用户时区，可用全局 `--timezone` 覆盖。`search` 没有列表游标，`--limit` 为上限，不保证凑满。
+
+默认 JSON 的片段来源位于 `data.documents[].metadata`：`recording_id` 是可继续用于 `recording get/download/export` 的字符串编号，`title/recorded_at` 用于引用来源。不能把 `doc_id/point_id/source_id` 当作录音编号。`--format text` 显示来源标题、录制时间与正文，不显示内部编号或原始分数。
+
+`data.low_confidence=true` 或 `data.documents=[]` 表示没有可引用片段，命令正常成功，text 提示“未找到相关内容。”。`score_type` 声明分数含义，重排分数也不是答案正确率。参数错误统一为 `INVALID_ARGUMENT`、退出码 2。后端检索能力不匹配时会明确报错，应联系维护者升级服务，不能改用其它数据冒充 RAG 结果。
 
 导入音频并触发转写需要额外的 `recording:import` 权限和用户明确授权。请先查看 `idock recording import --help`，确认文件、真实时长及执行计划。
 
